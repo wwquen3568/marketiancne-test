@@ -13,7 +13,19 @@
 <body>
     <form method="POST" action="" enctype="multipart/form-data">
         {% csrf_token %}
-        {{ form.as_p }}
+
+        <label for="id_title">제목: </label>
+        {{ form.title }}
+        <br>
+
+        <label for="id_content">내용: </label>
+        <br>
+        {{ form.content }}
+        <br>
+
+        <label for="id_attachment">첨부파일: </label>
+        {{ form.attachment }}
+        <br>
 
         <input class="btn btn-primary" type="submit" value="게시글 생성">
         <a class="btn btn-secondary" href="{% url 'board_read' %}" role="button">목록으로</a>

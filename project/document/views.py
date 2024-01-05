@@ -1,5 +1,7 @@
+from urllib.parse import quote  # 파일 다운로드시 한글 인코딩 문제 해결
+
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponseBadRequest
+from django.http import FileResponse, HttpResponseBadRequest
 
 from document.models import Board
 from document.forms import BoardForm
@@ -23,7 +25,8 @@ def board_detail(request, pk):
 # 게시판 생성
 def board_create(request):
     if request.method == 'POST':
-        form = BoardForm(request.POST)
+        print(request.FILES)
+        form = BoardForm(request.POST, request.FILES)
 
         # 유효성 검사
         if form.is_valid():
@@ -31,6 +34,7 @@ def board_create(request):
             return redirect('board_read')
 
         else:
+            print(form)
             return HttpResponseBadRequest()
     
     else:
@@ -43,7 +47,7 @@ def board_create(request):
 def board_edit(request, pk):
     board = get_object_or_404(Board, pk=pk)
     if request.method == 'POST':
-        form = BoardForm(request.POST, instance=board)
+        form = BoardForm(request.POST, request.FILES, instance=board)
         if form.is_valid():
             form.save()
             return redirect('board_detail', pk=pk)
@@ -65,3 +69,15 @@ def board_delete(request, pk):
         return redirect('board_read')
     
     return render(request, 'document/delete.html', {'board': board})
+
+
+def board_download(request, pk):
+    board = get_object_or_404(Board, pk=pk)
+    file_path = board.attachment.path
+    file_name  = board.attachment.name.split('/')[-1]
+    encoded_file_name = quote(file_name)  # 한글과 같이 파일 이름 인코드
+    
+    response = FileResponse(open(file_path, 'rb'))
+    response['Content-Disposition'] = f'attachment; filename="{encoded_file_name}"'
+    
+    return response

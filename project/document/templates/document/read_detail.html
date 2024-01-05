@@ -1,3 +1,5 @@
+{% load extract_filename %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -26,7 +28,9 @@
         </ul>
         <br>
 
-        첨부파일: {{ board.attachment }}
+        첨부파일: {{ board.attachment | extract_filename }}
+        <br>
+        <a class="btn btn-success" href="{% url 'board_download' board.pk %}" role="button">첨부파일 다운로드</a>
     </div>
 </body>
 </html>
